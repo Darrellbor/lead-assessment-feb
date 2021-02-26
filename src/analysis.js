@@ -120,8 +120,8 @@ async function analysis() {
   }
 }
 
-analysis()
-  .then((res) => console.log(res))
-  .catch((err) => console.log(err));
+// analysis()
+//   .then((res) => console.log(res))
+//   .catch((err) => console.log(err));
 
 module.exports = analysis;
