@@ -9,34 +9,31 @@ const { normalizeAmount, maxObjVal } = require('./utils');
 async function analysis() {
   try {
     const trips = await getTrips();
-    const noOfCashTrips = trips.filter((trip) => trip.isCash === true).length;
-    const noOfNonCashTrips = trips.filter((trip) => trip.isCash !== true)
-      .length;
     let billedTotal = 0,
-      cashBilledTotal = 0;
+      cashBilledTotal = 0,
+      noOfCashTrips = 0,
+      noOfNonCashTrips = 0;
     (nonCashBilledTotal = 0),
       (noOfDriversWithMoreThanOneVehicle = 0),
       (totalAmountEarnedByDriver = 0);
     let driverTally = {},
       driverRevenueTally = {},
+      driverDetails,
       maxDriverDetails = null,
       maxDriverDetailsByRevenue = null;
 
     for (let i = 0; i < trips.length; i++) {
       const trip = trips[i];
-      if (!trip.isCash)
+      if (!trip.isCash) {
+        noOfNonCashTrips++;
         nonCashBilledTotal += normalizeAmount(trip.billedAmount);
-      if (trip.isCash) cashBilledTotal += normalizeAmount(trip.billedAmount);
+      }
+      if (trip.isCash) {
+        noOfCashTrips++;
+        cashBilledTotal += normalizeAmount(trip.billedAmount);
+      }
       billedTotal += normalizeAmount(trip.billedAmount);
 
-      try {
-        //retrieve driver details
-        const driverDetails = (await getDriver(trip.driverID)) || null;
-        if (driverDetails && driverDetails.vehicleID.length > 1)
-          noOfDriversWithMoreThanOneVehicle++;
-      } catch (err) {
-        console.log(err);
-      }
 
       //set driver tally
       driverTally[trip.driverID]
@@ -52,6 +49,21 @@ async function analysis() {
             trip.billedAmount,
           ));
     }
+
+    //Sum drivers with more than one vehicle
+    for (let i = 0; i < Object.keys(driverTally).length; i++) {
+      const driverId = Object.keys(driverTally)[i];
+      try {
+        driver = await getDriver(driverId);
+      } catch (err) {
+        console.log(err);
+      }
+
+      if (Object.keys(driver).length > 0) {
+        if (driver.vehicleID.length > 1) noOfDriversWithMoreThanOneVehicle++;
+      }
+    }
+
     const maxDriverId = maxObjVal(driverTally);
     const maxDriverByRevenue = maxObjVal(driverRevenueTally);
 
@@ -81,6 +93,7 @@ async function analysis() {
     } catch (err) {
       console.log(err);
     }
+
     const highestEarningDriver = {
       name: maxDriverDetailsByRevenue.name,
       email: maxDriverDetailsByRevenue.email,

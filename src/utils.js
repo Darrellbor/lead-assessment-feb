@@ -3,5 +3,5 @@ module.exports.normalizeAmount = (amount) => {
 };
 
 module.exports.maxObjVal = (obj) => {
-  return Object.keys(obj).reduce((a, b) => (obj[a] > obj[b] ? a : b));
+  return Object.keys(obj).reduce((a, b) => (obj[a] >= obj[b] ? a : b));
 };

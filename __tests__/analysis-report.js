@@ -2,6 +2,8 @@ const analysis = require('../src/analysis');
 const driverReport = require('../src/report');
 const report = require('../fixtures/report.json');
 
+jest.setTimeout(30000);
+
 describe('analysis spec', () => {
   test('matches the required data format', () => {
     return expect(analysis()).resolves.toEqual({
@@ -35,7 +37,7 @@ describe('analysis spec', () => {
       billedTotal: 128224.69,
       cashBilledTotal: 69043.8,
       nonCashBilledTotal: 59180.89,
-      noOfDriversWithMoreThanOneVehicle: 3,
+      noOfDriversWithMoreThanOneVehicle: 4,
       mostTripsByDriver: {
         name: 'Bush Gibbs',
         email: 'bushgibbs@example.com',
